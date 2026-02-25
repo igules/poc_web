@@ -24,19 +24,19 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 def save_log(json_log):
     try:
         data = {
-            "user_name": "ㅇㄹㅇㄹㅇ",
-            "session": 1,
-            "user": "a",
-            "assistant": ["a","b"],
-            "assistant_selected": "a",
-            "bad_idx":1,
-            "good_idx":3,
-            "bad_reason":"g",
-            "good_reason":"g",
-            "reasoning":"abc"
+            "user_name": json_log["user_name"],
+            "session": json_log['session'],
+            "user": json_log['user'],
+            "assistant": json_log['assistant'],
+            "assistant_selected": json_log['assistant_selected'],
+            "bad_idx":json_log['bad_idx'],
+            "good_idx":json_log['good_idx'],
+            "bad_reason":json_log['bad_reason'],
+            "good_reason":json_log['good_reason'],
+            "reasoning":json_log['reasoning']
         }
-        print(json_log)
-        st.write(json_log)
+        print(data)
+        st.write(data)
 
         response = supabase.table("conv_log").insert(data).execute()
         st.write(response)
@@ -49,6 +49,7 @@ def save_log(json_log):
             return False
 
     except Exception as e:
+        
         st.error(f"에러 발생: {e}")
         return False
 
