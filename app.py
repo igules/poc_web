@@ -39,8 +39,7 @@ def save_log(json_log):
         st.write(data)
 
         response = supabase.table("conv_log").insert(data).execute()
-        st.write(response)
-        # time.sleep(3)
+        # st.write(response)
 
         if response.data:
             return True
@@ -76,13 +75,19 @@ def init_state() -> None:
        st.session_state.export_path = ""
    if "last_reasoning" not in st.session_state:
        st.session_state.last_reasoning = ""
+   if "user_name" not in st.session_state:
+       st.session_state.user_name = ""
+   if "experiment_started" not in st.session_state:
+       st.session_state.experiment_started = False
 
 
 def append_turn_log(record: dict) -> None:
-    st.session_state.turn_logs.append(record)
+    record_with_name = dict(record)
+    record_with_name["user_name"] = st.session_state.get("user_name", "")
+    st.session_state.turn_logs.append(record_with_name)
     
     with open(TURN_LOG_JSONL, "a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        f.write(json.dumps(record_with_name, ensure_ascii=False) + "\n")
 
 
 def export_turn_logs_to_excel() -> str:
@@ -207,7 +212,7 @@ def generate_three_responses(user_input: str, history: List[dict] = None) -> Lis
                "content": [
                    {
                    "type": "text",
-                   "text": "너는 사용자의 금융 고민을 듣고 조언을 해주는 어시스턴트야. 사용자는 주로 새롭게 생긴 여유자금에 대한 고민을 상담할거야. 그 고민에 대해서 최종 조언을 주는게 목표야. \n"
+                   "text": "너는 사용자의 금융 고민을 듣고 조언을 해주는 어시스턴트야. 그 고민에 대해서 최종 조언을 주는게 목표야. \n"
                    }
                ]
                },
@@ -305,6 +310,7 @@ def select_option(index: int) -> None:
     
     save_log(
         {
+           "user_name": st.session_state.get("user_name", ""),
            "session": pending_turn.get("session", st.session_state.session_id),
            "user": pending_turn.get("user", ""),
            "assistant": pending_turn.get("assistant", list(st.session_state.pending_options)),
@@ -347,6 +353,26 @@ def reset_chat() -> None:
 
 init_state()
 st.title("💸 사용자 실험")
+
+if not st.session_state.experiment_started:
+   left, center, right = st.columns([2, 3, 2])
+   with center:
+       st.markdown("### 실험 시작 전 정보를 입력해주세요")
+       name_value = st.text_input(
+           "이름",
+           value=st.session_state.user_name,
+           placeholder="이름을 입력하세요",
+       )
+       if st.button("실험 시작", type="primary", use_container_width=True):
+           clean_name = name_value.strip()
+           if not clean_name:
+               st.warning("이름을 입력해주세요.")
+           else:
+               st.session_state.user_name = clean_name
+               st.session_state.session_id = 1
+               st.session_state.experiment_started = True
+               st.rerun()
+   st.stop()
 
 if st.session_state.session_id == 3:
    st.markdown(
