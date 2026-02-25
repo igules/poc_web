@@ -23,20 +23,20 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def save_log(json_log):
     try:
-        # data = {
-        #     "user_name": "a",
-        #     "session": 1,
-        #     "user": "a",
-        #     "assistant": ["a","b"],
-        #     "assistant_selected": "a",
-        #     "bad_idx":1,
-        #     "good_idx":3,
-        #     "bad_reason":"g",
-        #     "good_reason":"g",
-        #     "reasoning":"abc"
-        # }
+        data = {
+            "user_name": "ㅇㄹㅇㄹㅇ",
+            "session": 1,
+            "user": "a",
+            "assistant": ["a","b"],
+            "assistant_selected": "a",
+            "bad_idx":1,
+            "good_idx":3,
+            "bad_reason":"g",
+            "good_reason":"g",
+            "reasoning":"abc"
+        }
 
-        response = supabase.table("conv_log").insert(json_log).execute()
+        response = supabase.table("conv_log").insert(data).execute()
         st.write(response)
         # time.sleep(3)
 
