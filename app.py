@@ -7,6 +7,7 @@ from typing import List
 from pathlib import Path
 from openai import OpenAI
 
+import time
 from supabase import create_client
 
 
@@ -36,7 +37,8 @@ def save_log(json_log):
         # }
 
         response = supabase.table("conv_log").insert(json_log).execute()
-        # st.write(response)
+        st.write(response)
+        time.sleep(3)
 
         if response.data:
             return True
@@ -297,6 +299,7 @@ def select_option(index: int) -> None:
     st.session_state.messages.append({"role": "assistant", "content": selected})
 
     pending_turn = st.session_state.pending_turn or {}
+    
     save_log(
         {
            "session": pending_turn.get("session", st.session_state.session_id),
