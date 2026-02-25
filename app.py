@@ -428,8 +428,16 @@ if st.session_state.pending_options:
        .option-card {
            padding: 12px;
            height: 220px;
-           background: #f5f5dc;
+           background: #ffffff;
            overflow-y: auto;
+       }
+       button[aria-label="👍 good"],
+       button[aria-label="✅ good"] {
+           border: 2px solid #86efac !important;
+       }
+       button[aria-label="👎 bad"],
+       button[aria-label="✅ bad"] {
+           border: 2px solid #fca5a5 !important;
        }
        </style>
        """,
