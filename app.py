@@ -38,7 +38,7 @@ def save_log(json_log):
 
         response = supabase.table("conv_log").insert(json_log).execute()
         st.write(response)
-        time.sleep(3)
+        # time.sleep(3)
 
         if response.data:
             return True
