@@ -22,21 +22,22 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def save_log(json_log):
     try:
-        data = {
-            "user_name": "a",
-            "session": 1,
-            "user": "a",
-            "assistant": ["a","b"],
-            "assistant_selected": "a",
-            "bad_idx":1,
-            "good_idx":3,
-            "bad_reason":"g",
-            "good_reason":"g",
-            "reasoning":"abc"
-        }
+        # data = {
+        #     "user_name": "a",
+        #     "session": 1,
+        #     "user": "a",
+        #     "assistant": ["a","b"],
+        #     "assistant_selected": "a",
+        #     "bad_idx":1,
+        #     "good_idx":3,
+        #     "bad_reason":"g",
+        #     "good_reason":"g",
+        #     "reasoning":"abc"
+        # }
 
-        response = supabase.table("conv_log").insert(data).execute()
-        st.write(response)
+        response = supabase.table("conv_log").insert(json_log).execute()
+        # st.write(response)
+
         if response.data:
             return True
         else:
@@ -68,6 +69,8 @@ def init_state() -> None:
        st.session_state.export_done = False
    if "export_path" not in st.session_state:
        st.session_state.export_path = ""
+   if "last_reasoning" not in st.session_state:
+       st.session_state.last_reasoning = ""
 
 
 def append_turn_log(record: dict) -> None:
@@ -127,7 +130,8 @@ def parse_answers(raw_text: str) -> List[str]:
        payload = json.loads(cleaned_text)
        answers = payload.get("answers", [])
       
-       reasoning = payload.get("reasoning", [])
+       reasoning = payload.get("reasoning", "")
+       st.session_state.last_reasoning = str(reasoning)
        with open(FILE_NAME, "a", encoding="utf-8") as f:
            f.write("REASONING: " + str(reasoning) + "\n")
 
@@ -249,6 +253,7 @@ def generate_three_responses(user_input: str, history: List[dict] = None) -> Lis
                    "good_idx": None,
                    "bad_reason": "",
                    "good_reason": "",
+                   "reasoning": st.session_state.get("last_reasoning", ""),
                }
            )
            st.session_state.pending_turn = None
@@ -278,22 +283,22 @@ def format_for_html(text: str) -> str:
 
 
 def select_option(index: int) -> None:
-   current_set = st.session_state.option_set_id
-   feedback = st.session_state.option_feedback.get(current_set, {})
-   good_idx = feedback.get("good")
-   bad_idx = feedback.get("bad")
+    current_set = st.session_state.option_set_id
+    feedback = st.session_state.option_feedback.get(current_set, {})
+    good_idx = feedback.get("good")
+    bad_idx = feedback.get("bad")
 
-   if good_idx is None or bad_idx is None:
-       st.warning("진행하려면 3개 답변 중 good 1개와 bad 1개를 먼저 선택해주세요.")
-       return
+    if good_idx is None or bad_idx is None:
+        st.warning("진행하려면 3개 답변 중 good 1개와 bad 1개를 먼저 선택해주세요.")
+        return
 
-   selected = st.session_state.pending_options[index]
+    selected = st.session_state.pending_options[index]
 
-   st.session_state.messages.append({"role": "assistant", "content": selected})
+    st.session_state.messages.append({"role": "assistant", "content": selected})
 
-   pending_turn = st.session_state.pending_turn or {}
-   append_turn_log(
-       {
+    pending_turn = st.session_state.pending_turn or {}
+    save_log(
+        {
            "session": pending_turn.get("session", st.session_state.session_id),
            "user": pending_turn.get("user", ""),
            "assistant": pending_turn.get("assistant", list(st.session_state.pending_options)),
@@ -302,13 +307,27 @@ def select_option(index: int) -> None:
            "good_idx": good_idx,
            "bad_reason": feedback.get("bad_reason", ""),
            "good_reason": feedback.get("good_reason", ""),
+           "reasoning": pending_turn.get("reasoning", st.session_state.get("last_reasoning", "")),
        }
-   )
+    )
+    # append_turn_log(
+    #    {
+    #        "session": pending_turn.get("session", st.session_state.session_id),
+    #        "user": pending_turn.get("user", ""),
+    #        "assistant": pending_turn.get("assistant", list(st.session_state.pending_options)),
+    #        "assistant_selected": selected,
+    #        "bad_idx": bad_idx,
+    #        "good_idx": good_idx,
+    #        "bad_reason": feedback.get("bad_reason", ""),
+    #        "good_reason": feedback.get("good_reason", ""),
+    #        "reasoning": pending_turn.get("reasoning", st.session_state.get("last_reasoning", "")),
+    #    }
+    # )
 
-   st.session_state.pending_options = []
-   st.session_state.option_feedback.pop(current_set, None)
-   st.session_state.pending_turn = None
-   st.session_state.option_set_id += 1
+    st.session_state.pending_options = []
+    st.session_state.option_feedback.pop(current_set, None)
+    st.session_state.pending_turn = None
+    st.session_state.option_set_id += 1
 
 
 def reset_chat() -> None:
@@ -321,18 +340,9 @@ def reset_chat() -> None:
 
 
 init_state()
-
-
-st.title("💸 금융고민 상담소")
-
+st.title("💸 사용자 실험")
 
 if st.session_state.session_id == 3:
-#    if not st.session_state.export_done:
-#        try:
-#            st.session_state.export_path = export_turn_logs_to_excel()
-#            st.session_state.export_done = True
-#        except Exception as e:
-#            st.error(f"엑셀 저장 실패: {e}")
    st.markdown(
        """
        ### 🎉 실험이 종료되었습니다
@@ -520,7 +530,7 @@ if st.session_state.pending_options:
            disabled=option_fb.get("good") is None or option_fb.get("bad") is None,
            use_container_width=True,
        ):
-           save_log({"a":"B"})
+           
            select_option(selected_idx)
            st.rerun()
 
@@ -533,18 +543,16 @@ user_prompt = st.chat_input(
 
 # if user_prompt and not st.session_state.pending_options:
 if user_prompt:
-   ## Save user prompts
-#    with open('history.txt', 'a') as f:
-#        f.write("[USER]\n" + user_prompt + "\n")
-
    st.session_state.messages.append({"role": "user", "content": user_prompt})
    st.session_state.pending_turn = {
        "session": st.session_state.session_id,
        "user": user_prompt,
        "assistant": [],
+       "reasoning": "",
    }
    with st.spinner("로딩중..."):
        st.session_state.pending_options = generate_three_responses(user_prompt, history=list(st.session_state.get("messages", []))[-10:])
    if st.session_state.pending_options:
        st.session_state.pending_turn["assistant"] = list(st.session_state.pending_options)
+       st.session_state.pending_turn["reasoning"] = st.session_state.get("last_reasoning", "")
    st.rerun()
