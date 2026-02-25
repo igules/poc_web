@@ -457,6 +457,8 @@ if st.session_state.pending_options:
 
 
        with cols[i]:
+           is_good = option_fb.get("good") == i
+           is_bad = option_fb.get("bad") == i
            safe_option = format_for_html(option)
            st.markdown(
                f'<div class="option-card"><strong>{i + 1}.</strong> {safe_option}</div>',
@@ -468,9 +470,13 @@ if st.session_state.pending_options:
                <style>
                .st-key-mark_good_{key_prefix} button {{
                    border: 2px solid #86efac !important;
+                   background: {"#dcfce7" if is_good else "#ffffff"} !important;
+                   color: {"#166534" if is_good else "inherit"} !important;
                }}
                .st-key-mark_bad_{key_prefix} button {{
                    border: 2px solid #fca5a5 !important;
+                   background: {"#fee2e2" if is_bad else "#ffffff"} !important;
+                   color: {"#991b1b" if is_bad else "inherit"} !important;
                }}
                </style>
                """,
@@ -479,7 +485,6 @@ if st.session_state.pending_options:
 
            mark_col1, mark_col2 = st.columns(2)
            with mark_col1:
-               is_good = option_fb.get("good") == i
                good_label = "✅ good" if is_good else "👍 good"
                if st.button(good_label, key=f"mark_good_{key_prefix}", use_container_width=True):
                    option_fb["good"] = i
@@ -489,7 +494,6 @@ if st.session_state.pending_options:
                 #        f.write(f"[OPTION_MARK] set={current_set} option={i} mark=good\n")
                    st.rerun()
            with mark_col2:
-               is_bad = option_fb.get("bad") == i
                bad_label = "✅ bad" if is_bad else "👎 bad"
                if st.button(bad_label, key=f"mark_bad_{key_prefix}", use_container_width=True):
                    option_fb["bad"] = i
