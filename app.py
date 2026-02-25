@@ -23,22 +23,22 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def save_log(json_log):
     try:
-        data = {
-            "user_name": json_log["user_name"],
-            "session": json_log['session'],
-            "user": json_log['user'],
-            "assistant": json_log['assistant'],
-            "assistant_selected": json_log['assistant_selected'],
-            "bad_idx":json_log['bad_idx'],
-            "good_idx":json_log['good_idx'],
-            "bad_reason":json_log['bad_reason'],
-            "good_reason":json_log['good_reason'],
-            "reasoning":json_log['reasoning']
-        }
-        print(data)
-        st.write(data)
+        # data = {
+        #     "user_name": json_log["user_name"],
+        #     "session": json_log['session'],
+        #     "user": json_log['user'],
+        #     "assistant": json_log['assistant'],
+        #     "assistant_selected": json_log['assistant_selected'],
+        #     "bad_idx":json_log['bad_idx'],
+        #     "good_idx":json_log['good_idx'],
+        #     "bad_reason":json_log['bad_reason'],
+        #     "good_reason":json_log['good_reason'],
+        #     "reasoning":json_log['reasoning']
+        # }
+        # print(data)
+        # st.write(data)
 
-        response = supabase.table("conv_log").insert(data).execute()
+        response = supabase.table("conv_log").insert(json_log).execute()
         # st.write(response)
 
         if response.data:
@@ -253,19 +253,19 @@ def generate_three_responses(user_input: str, history: List[dict] = None) -> Lis
 
        if len(answers) == 1:
            st.session_state.messages.append({"role": "assistant", "content": answers[0]})
-           append_turn_log(
-               {
-                   "session": st.session_state.session_id,
-                   "user": user_input,
-                   "assistant": [answers[0]],
-                   "assistant_selected": answers[0],
-                   "bad_idx": None,
-                   "good_idx": None,
-                   "bad_reason": "",
-                   "good_reason": "",
-                   "reasoning": st.session_state.get("last_reasoning", ""),
-               }
-           )
+           single_payload = {
+               "user_name": st.session_state.get("user_name", ""),
+               "session": st.session_state.session_id,
+               "user": user_input,
+               "assistant": [answers[0]],
+               "assistant_selected": answers[0],
+               "bad_idx": None,
+               "good_idx": None,
+               "bad_reason": "",
+               "good_reason": "",
+               "reasoning": st.session_state.get("last_reasoning", ""),
+           }
+           save_log(single_payload)
            st.session_state.pending_turn = None
            return []
        if len(answers) >= 3:
@@ -322,20 +322,7 @@ def select_option(index: int) -> None:
            "reasoning": pending_turn.get("reasoning", st.session_state.get("last_reasoning", "")),
        }
     )
-    # append_turn_log(
-    #    {
-    #        "session": pending_turn.get("session", st.session_state.session_id),
-    #        "user": pending_turn.get("user", ""),
-    #        "assistant": pending_turn.get("assistant", list(st.session_state.pending_options)),
-    #        "assistant_selected": selected,
-    #        "bad_idx": bad_idx,
-    #        "good_idx": good_idx,
-    #        "bad_reason": feedback.get("bad_reason", ""),
-    #        "good_reason": feedback.get("good_reason", ""),
-    #        "reasoning": pending_turn.get("reasoning", st.session_state.get("last_reasoning", "")),
-    #    }
-    # )
-
+    
     st.session_state.pending_options = []
     st.session_state.option_feedback.pop(current_set, None)
     st.session_state.pending_turn = None
@@ -357,7 +344,7 @@ st.title("💸 사용자 실험")
 if not st.session_state.experiment_started:
    left, center, right = st.columns([2, 3, 2])
    with center:
-       st.markdown("### 실험 시작 전 정보를 입력해주세요")
+       st.markdown("### 실험 시작 전 정보를 입력해주세요😃")
        name_value = st.text_input(
            "이름",
            value=st.session_state.user_name,
