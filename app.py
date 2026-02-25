@@ -346,7 +346,7 @@ st.markdown(
    <style>
    .stApp {
        background: radial-gradient(circle at 20% 20%, #1f2937 0%, #0f172a 55%, #020617 100%);
-       color: #f8fafc;
+       color: #e5e7eb;
    }
    [data-testid="stHeader"] {
        background: transparent;
@@ -354,21 +354,25 @@ st.markdown(
    [data-testid="stSidebar"] {
        background: #0b1220;
    }
-   h1, h2, h3, h4, h5, h6, p, label, div {
-       color: #f8fafc;
+   h1, h2, h3, h4, h5, h6, p, label, span {
+       color: #e5e7eb;
    }
    .stMarkdown, .stCaption {
        color: #e2e8f0;
    }
    div[data-testid="stChatMessage"] {
-       background: rgba(255, 255, 255, 0.08);
-       border: 1px solid rgba(148, 163, 184, 0.35);
+       background: rgba(15, 23, 42, 0.5);
+       border: 1px solid rgba(148, 163, 184, 0.25);
        border-radius: 14px;
-       backdrop-filter: blur(4px);
+   }
+   div[data-testid="stChatMessageContent"] {
+       background: rgba(255, 255, 255, 0.08);
+       color: #e5e7eb !important;
+       border-radius: 12px;
    }
    div[data-testid="stTextInput"] input,
    div[data-testid="stTextArea"] textarea,
-   div[data-testid="stSelectbox"] > div > div {
+   div[data-baseweb="select"] > div {
        background: #f8fafc !important;
        color: #0f172a !important;
        border-radius: 10px !important;
@@ -385,10 +389,14 @@ st.markdown(
        color: #0f172a !important;
        font-weight: 600 !important;
    }
-   .stButton > button[kind="primary"] {
+   .stButton > button[kind="primary"],
+   .stButton > button[data-testid="baseButton-primary"] {
        background: #f8fafc !important;
        color: #0f172a !important;
        border: 1px solid #94a3b8 !important;
+   }
+   .stButton > button * {
+       color: #0f172a !important;
    }
    .option-card {
        background: #f8fafc !important;
