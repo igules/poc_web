@@ -428,7 +428,7 @@ if st.session_state.pending_options:
        .option-card {
            padding: 12px;
            height: 220px;
-           background: #ffffff;
+           background: #f5f5dc;
            overflow-y: auto;
        }
        </style>
