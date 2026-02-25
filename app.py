@@ -341,6 +341,73 @@ def reset_chat() -> None:
 init_state()
 st.title("💸 사용자 실험")
 
+st.markdown(
+   """
+   <style>
+   .stApp {
+       background: radial-gradient(circle at 20% 20%, #1f2937 0%, #0f172a 55%, #020617 100%);
+       color: #f8fafc;
+   }
+   [data-testid="stHeader"] {
+       background: transparent;
+   }
+   [data-testid="stSidebar"] {
+       background: #0b1220;
+   }
+   h1, h2, h3, h4, h5, h6, p, label, div {
+       color: #f8fafc;
+   }
+   .stMarkdown, .stCaption {
+       color: #e2e8f0;
+   }
+   div[data-testid="stChatMessage"] {
+       background: rgba(255, 255, 255, 0.08);
+       border: 1px solid rgba(148, 163, 184, 0.35);
+       border-radius: 14px;
+       backdrop-filter: blur(4px);
+   }
+   div[data-testid="stTextInput"] input,
+   div[data-testid="stTextArea"] textarea,
+   div[data-testid="stSelectbox"] > div > div {
+       background: #f8fafc !important;
+       color: #0f172a !important;
+       border-radius: 10px !important;
+       border: 1px solid #cbd5e1 !important;
+   }
+   div[data-testid="stChatInput"] textarea {
+       background: #f8fafc !important;
+       color: #0f172a !important;
+   }
+   .stButton > button {
+       border-radius: 10px !important;
+       border: 1px solid rgba(203, 213, 225, 0.6) !important;
+       background: #e2e8f0 !important;
+       color: #0f172a !important;
+       font-weight: 600 !important;
+   }
+   .stButton > button[kind="primary"] {
+       background: #f8fafc !important;
+       color: #0f172a !important;
+       border: 1px solid #94a3b8 !important;
+   }
+   .option-card {
+       background: #f8fafc !important;
+       color: #0f172a !important;
+       border: 1px solid #cbd5e1 !important;
+   }
+   .next-action-wrap {
+       background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%) !important;
+       border: 1px solid #cbd5e1 !important;
+       border-radius: 12px;
+   }
+   .next-action-title {
+       color: #0f172a !important;
+   }
+   </style>
+   """,
+   unsafe_allow_html=True,
+)
+
 if not st.session_state.experiment_started:
    left, center, right = st.columns([2, 3, 2])
    with center:
