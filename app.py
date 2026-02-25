@@ -431,14 +431,6 @@ if st.session_state.pending_options:
            background: #ffffff;
            overflow-y: auto;
        }
-       button[aria-label="👍 good"],
-       button[aria-label="✅ good"] {
-           border: 2px solid #86efac !important;
-       }
-       button[aria-label="👎 bad"],
-       button[aria-label="✅ bad"] {
-           border: 2px solid #fca5a5 !important;
-       }
        </style>
        """,
        unsafe_allow_html=True,
@@ -468,6 +460,20 @@ if st.session_state.pending_options:
            safe_option = format_for_html(option)
            st.markdown(
                f'<div class="option-card"><strong>{i + 1}.</strong> {safe_option}</div>',
+               unsafe_allow_html=True,
+           )
+
+           st.markdown(
+               f"""
+               <style>
+               .st-key-mark_good_{key_prefix} button {{
+                   border: 2px solid #86efac !important;
+               }}
+               .st-key-mark_bad_{key_prefix} button {{
+                   border: 2px solid #fca5a5 !important;
+               }}
+               </style>
+               """,
                unsafe_allow_html=True,
            )
 
