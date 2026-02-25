@@ -35,6 +35,8 @@ def save_log(json_log):
             "good_reason":"g",
             "reasoning":"abc"
         }
+        print(json_log)
+        st.write(json_log)
 
         response = supabase.table("conv_log").insert(data).execute()
         st.write(response)
