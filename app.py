@@ -7,12 +7,45 @@ from typing import List
 from pathlib import Path
 from openai import OpenAI
 
+from supabase import create_client
+
 
 st.set_page_config(page_title="금융고민 상담소", page_icon="💸", layout="wide")
 FILE_NAME = "reasoning.txt"
 TURN_LOG_JSONL = "turn_logs.jsonl"
 TURN_LOG_XLSX = "turn_logs.xlsx"
 
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+def save_log(json_log):
+    try:
+        data = {
+            "user_name": "a",
+            "session": 1,
+            "user": "a",
+            "assistant": ["a","b"],
+            "assistant_selected": "a",
+            "bad_idx":1,
+            "good_idx":3,
+            "bad_reason":"g",
+            "good_reason":"g",
+            "reasoning":"abc"
+        }
+
+        response = supabase.table("conv_log").insert(data).execute()
+
+        if response.data:
+            return True
+        else:
+            st.error("저장 실패")
+            return False
+
+    except Exception as e:
+        st.error(f"에러 발생: {e}")
+        return False
 
 def init_state() -> None:
    if "messages" not in st.session_state:
@@ -48,7 +81,7 @@ def export_turn_logs_to_excel() -> str:
     jsonl_path = Path(__file__).resolve().parent / TURN_LOG_JSONL
     if not jsonl_path.exists() or jsonl_path.stat().st_size == 0:
         return ""
-    print("jsonjson")
+
     try:
         df = pd.read_json(jsonl_path, lines=True)
     except ValueError as e:
@@ -190,16 +223,7 @@ def generate_three_responses(user_input: str, history: List[dict] = None) -> Lis
            verbosity="medium",
            store=False
        )
-    #    response = client.chat.completions.create(
-    #        model = "gpt-4o-mini",
-    #        messages = messages,
-    #        response_format={"type": "text"},
-    #        verbosity="medium",
-    #        reasoning_effort="low",
-    #        store=False
-    #    )
-
-
+    
        content = response.choices[0].message.content
        print(type(content))
        print(content)
@@ -496,6 +520,7 @@ if st.session_state.pending_options:
            disabled=option_fb.get("good") is None or option_fb.get("bad") is None,
            use_container_width=True,
        ):
+           save_log({"a":"B"})
            select_option(selected_idx)
            st.rerun()
 
